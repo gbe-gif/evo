@@ -1,0 +1,6 @@
+{
+  "name": "Evoracum System",
+  "description": "A rendering engine and TRPG master interface for the Evoracum roleplaying game.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

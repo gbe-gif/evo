@@ -1,0 +1,445 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { characters, Character } from './data';
+
+type AppMode = 'evoracum' | 'arca';
+type EvoracumTab = 'home' | 'map' | 'profile' | 'system';
+type ArcaTab = 'list' | 'switch' | 'detail';
+
+export default function App() {
+  const [appMode, setAppMode] = useState<AppMode>('evoracum');
+  const [evoTab, setEvoTab] = useState<EvoracumTab>('home');
+  const [arcaTab, setArcaTab] = useState<ArcaTab>('list');
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
+
+  const switchToArca = (charId?: string) => {
+    setAppMode('arca');
+    if (charId) {
+      setSelectedCharacterId(charId);
+      setArcaTab('detail');
+    } else {
+      setArcaTab('list');
+    }
+  };
+
+  const switchToEvo = () => {
+    setAppMode('evoracum');
+    setEvoTab('home');
+  };
+
+  return (
+    <div className={`min-h-screen w-full transition-colors duration-500 flex flex-col ${appMode === 'evoracum' ? 'bg-cyber-bg text-gray-100 font-sans' : 'arca-container font-sans'}`}>
+      <main className={`flex-1 w-full ${appMode === 'evoracum' ? 'max-w-3xl' : 'max-w-5xl'} mx-auto pb-24 relative overflow-x-hidden flex flex-col justify-center`}>
+        <AnimatePresence mode="wait">
+          {appMode === 'evoracum' ? (
+            <motion.div
+              key="evoracum"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              className="p-6"
+            >
+              {evoTab === 'home' && <EvoracumHome />}
+              {evoTab === 'map' && <EvoracumMap />}
+              {evoTab === 'profile' && (
+                <div className="text-center mt-20">
+                  <h2 className="text-2xl font-bold mb-4 text-glow">👤 내 정보</h2>
+                  <p className="text-gray-400 mb-8">시민증을 로드 중입니다...</p>
+                  <button 
+                    onClick={() => switchToArca()}
+                    className="px-6 py-3 border border-neon-blue text-neon-blue rounded hover:bg-neon-blue hover:text-cyber-bg transition-colors shadow-[0_0_10px_rgba(0,240,255,0.3)]"
+                  >
+                    아르카 데이터베이스 접속
+                  </button>
+                </div>
+              )}
+              {evoTab === 'system' && (
+                <div className="text-center mt-20 text-gray-500">
+                  <p>시스템 설정 메뉴 접근 권한이 없습니다.</p>
+                </div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="arca"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+              className="arca-document-frame p-6 md:p-10 my-4 md:my-8 mx-4 shadow-xl relative min-h-[720px] flex flex-col"
+            >
+              {arcaTab === 'list' && (
+                <ArcaList onSelect={(id) => { setSelectedCharacterId(id); setArcaTab('detail'); }} />
+              )}
+              {arcaTab === 'switch' && (
+                <ArcaList onSelect={(id) => { setSelectedCharacterId(id); setArcaTab('detail'); }} highlight="switch" />
+              )}
+              {arcaTab === 'detail' && selectedCharacterId && (
+                <ArcaDetail character={characters.find(c => c.id === selectedCharacterId)!} />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Navigation Bar */}
+      <nav className={`fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md pb-safe transition-colors duration-500 ${appMode === 'evoracum' ? 'bg-cyber-bg/80 border-t border-gray-800' : 'arca-nav-bar h-[50px] shadow-[0_-5px_15px_rgba(0,0,0,0.15)] flex justify-center items-center gap-[40px] font-light text-[13px] border-none'}`}>
+        <div className={`mx-auto flex justify-between items-center px-2 sm:px-4 h-full w-full ${appMode === 'evoracum' ? 'max-w-3xl' : 'max-w-4xl justify-center gap-6 md:gap-[40px]'}`}>
+          {appMode === 'evoracum' ? (
+            <>
+              <NavButton active={evoTab === 'home'} onClick={() => setEvoTab('home')} color="neon">🏠 홈</NavButton>
+              <NavButton active={evoTab === 'map'} onClick={() => setEvoTab('map')} color="neon">📜 에보라쿰 지도</NavButton>
+              <NavButton active={evoTab === 'profile'} onClick={() => setEvoTab('profile')} color="neon">👤 내 정보</NavButton>
+              <NavButton active={evoTab === 'system'} onClick={() => setEvoTab('system')} color="neon">⚙️ 시스템</NavButton>
+            </>
+          ) : (
+            <>
+              <NavButton active={arcaTab === 'list'} onClick={() => setArcaTab('list')} color="arca" isArca>📂 목록으로</NavButton>
+              <NavButton active={arcaTab === 'switch'} onClick={() => setArcaTab('switch')} color="arca" isArca>👤 인물 전환</NavButton>
+              <NavButton active={arcaTab === 'detail'} onClick={() => { if(selectedCharacterId) setArcaTab('detail'); else setArcaTab('list'); }} color="arca" isArca>📑 상세 파일</NavButton>
+              <NavButton active={false} onClick={switchToEvo} color="arca" isArca>🔓 로그아웃</NavButton>
+            </>
+          )}
+        </div>
+      </nav>
+    </div>
+  );
+}
+
+// ==========================================
+// Evoracum Views
+// ==========================================
+
+function EvoracumHome() {
+  return (
+    <div className="space-y-10">
+      <header className="mb-8 border-b border-gray-800 pb-6 text-center">
+        <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-concord-gold mb-2 text-glow">EVORACUM</h1>
+        <p className="text-sm text-gray-400 tracking-widest uppercase">신입 시민을 위한 정착 가이드</p>
+      </header>
+
+      <section>
+        <h2 className="text-xl font-bold text-neon-blue mb-4 border-l-4 border-neon-blue pl-3">
+          <div className="flex items-center gap-2"><span>🌌</span> 배경</div>
+          <div className="text-[0.9em] font-medium opacity-90 mt-1">: 진화적 구원, 레스큐(Rescue)</div>
+        </h2>
+        <ul className="space-y-3 text-gray-300 text-[0.95rem] leading-relaxed">
+          <li className="flex items-start"><span className="text-neon-blue mr-2">▪</span> 2062년 환경파괴로 인한 멸망 직전, 유전자 변이로 첫 이능력 발현함</li>
+          <li className="flex items-start"><span className="text-neon-blue mr-2">▪</span> 인류 존속의 열쇠가 된 이 능력을 '진화적 구원'이라는 의미의 '레스큐'라 명명함</li>
+          <li className="flex items-start"><span className="text-neon-blue mr-2">▪</span> 현재 인류의 72%가 이능력자이며, 무능력자(Lv.0)부터 자연재해급(Lv.5)까지 경지가 나뉨</li>
+          <li className="flex items-start">
+            <span className="text-neon-blue mr-2">▪</span>
+            <div className="flex-1">
+              직업과 이능력은 전혀 무관할 수 있음
+              <div className="text-gray-500 mt-1 sm:mt-0 sm:inline sm:ml-1 tracking-tight">(예: Lv.2 탈모빔 공무원)</div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 className="text-xl font-bold text-concord-gold mb-4 border-l-4 border-concord-gold pl-3">
+          <div className="flex items-center gap-2"><span>🏛️</span> 시스템</div>
+          <div className="text-[0.9em] font-medium opacity-90 mt-1 text-concord-gold/90">: 아르카(Arca)와 절대 법률</div>
+        </h2>
+        <ul className="space-y-3 text-gray-300 text-[0.95rem] leading-relaxed">
+          <li className="flex items-start"><span className="text-concord-gold mr-2">▪</span> 2070년 창설된 이능력자 협회로, 인류는 의무적으로 이능을 신고해야 함</li>
+          <li className="flex items-start"><span className="text-concord-gold mr-2">▪</span> 신고 시 사고 수습반 지원 등 '특별 보험' 혜택을 제공받음</li>
+          <li className="flex items-start"><span className="text-concord-gold mr-2">▪</span> 시민들은 레스큐 사용 규정인 '아르카 법'을 무조건 준수해야 함</li>
+          <li className="flex items-start text-gray-200 bg-gray-900/50 p-3 rounded border border-gray-800 border-l-concord-gold border-l-2">
+            <div>
+              <span className="font-bold text-concord-gold flex items-center gap-1 mb-1"><span>💰</span> 화폐 (콘코드, Concord)</span>
+              옥수수알 빛깔의 노란 금화(속칭 콘). 아르카가 발행하며 위조 방지 레스큐가 얽힌 역작. 1콘 당 옛 화폐 기준 약 1000$의 가치를 지님. 물가 기준 생수 한 병은 0.001콘임.
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section className="bg-red-950/20 border border-red-900/50 rounded-lg p-5">
+        <h2 className="text-xl font-bold text-red-500 mb-4">
+          <div className="flex items-center gap-2"><span>⚠️</span> 경고</div>
+          <div className="text-[0.9em] font-medium opacity-90 mt-1 text-red-500/90">: 파문(Excommunicado)과 루스트라(Lustra)</div>
+        </h2>
+        <ul className="space-y-3 text-red-200/80 text-[0.95rem] leading-relaxed">
+          <li className="flex items-start"><span className="text-red-500 mr-2">▪</span> 레스큐 중범죄 발생 시, 전 지역에 종소리가 울리며 아르카 시스템에서 말소됨</li>
+          <li className="flex items-start"><span className="text-red-500 mr-2">▪</span> 이를 '파문'이라 부르며, 현상금이 걸린 고깃덩이로 전락함</li>
+          <li className="flex items-start"><span className="text-red-500 mr-2">▪</span> 합법적 킬러 집단인 '루스트라'가 이들의 처형을 담당함</li>
+          <li className="flex items-start"><span className="text-red-500 mr-2">▪</span> 루스트라는 평소 일반인 사이에 섞여 일상을 보내며, 고보수(의뢰당 2콘 이상)를 받는 시민들의 동경 대상임</li>
+        </ul>
+      </section>
+      
+      <div className="text-center mt-12 text-gray-500 text-sm animate-pulse">
+        *(시스템: 정보 로딩 완료. 유저의 액션을 대기합니다.)*
+      </div>
+    </div>
+  );
+}
+
+function EvoracumMap() {
+  const regions = [
+    { 
+      icon: '💧', name: '리비움 (중심부)', title: '캄 스트리트', subtitle: '절대 성역', 
+      desc: ['대광장과 맑은 운하가 흐르는 최첨단 베네치아 풍경.', 'PVP 및 파문자 처형이 전면 금지된 라자로 소유의 절대 성역.', '단, 경범죄만 저질러도 즉각 파문당하는 통제된 꿈의 주거지임.'], 
+      color: 'text-blue-400',
+      images: [{ url: 'https://gbe88.uk/K/BG_19.webp', label: '리비움 전경' }]
+    },
+    { 
+      icon: '🥐', name: '둘시아 (서부구)', title: '부유층 주거지', subtitle: '카페 & 병원', 
+      desc: ['빵과 버터 향이 풍기는 한적하고 우아한 부유층 주거지.', '세베린의 카페와 리버의 병원이 위치함.'], 
+      color: 'text-amber-400',
+      images: [
+        { url: 'https://gbe88.uk/K/BG_20.webp', label: '둘시아 전경' },
+        { url: 'https://gbe88.uk/K/BG_24.webp', label: '세베린의 카페' },
+        { url: 'https://gbe88.uk/K/BG_25.webp', label: '리버의 병원' }
+      ]
+    },
+    { 
+      icon: '⚡', name: '플루오리아 (동부구)', title: '하이테크 빌딩 숲', subtitle: '이지스 소프트', 
+      desc: ['밤낮없이 네온빛이 번쩍이는 하이테크 빌딩 숲. 에너지 드링크와 오존 향이 남.', '첨단 산업 대기업 사옥이 밀집해 있으며, 차희재의 \'이지스 소프트\' 사옥이 위치함.'], 
+      color: 'text-neon-blue',
+      images: [{ url: 'https://gbe88.uk/K/BG_22.webp', label: '플루오리아 전경' }]
+    },
+    { 
+      icon: '🏛️', name: '보레아스 (북부구)', title: '엘리트주의 산실', subtitle: '대리석 저택가', 
+      desc: ['아르카 고위직과 정치인이 거주하는 클래식하고 고요한 대리석 저택가.', '폐쇄적인 엘리트주의의 산실임.'], 
+      color: 'text-gray-300',
+      images: [{ url: 'https://gbe88.uk/K/BG_21.webp', label: '보레아스 전경' }]
+    },
+    { 
+      icon: '🎲', name: '야누시아 (남부 항구)', title: '무법지대', subtitle: '녹스 피어', 
+      desc: ['표면적으론 럭셔리 카지노와 인공 해변이 있는 낭만적인 관광지.', '밤이 되면 녹스 피어 너머로 불법 무기와 약물이 거래되는 무법지대로 돌변함.'], 
+      color: 'text-purple-400',
+      images: [{ url: 'https://gbe88.uk/K/BG_23.webp', label: '야누시아 전경' }]
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <header className="mb-6 text-center">
+        <h1 className="text-2xl font-bold text-white mb-2">메가 시티 '에보라쿰'</h1>
+        <p className="text-sm text-gray-400">뉴욕터에 자리 잡은 이능력자 특화 글로벌 도시.<br/>주민 98%가 이능력자라 사건사고가 일상이며, 수습 시스템이 완벽하게 발달함.</p>
+      </header>
+
+      <div className="space-y-6">
+        {regions.map((region, idx) => (
+          <motion.div 
+            key={idx}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="bg-gray-900/40 border border-gray-800 rounded-xl backdrop-blur-sm shadow-lg overflow-hidden flex flex-col"
+          >
+            {/* Image Gallery */}
+            <div className="w-full relative flex overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              {region.images.map((img, i) => (
+                <div key={i} className="relative w-full shrink-0 snap-center aspect-[21/9] bg-black">
+                  <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 md:p-3 text-xs md:text-sm font-medium text-gray-200 flex items-end">
+                    {img.label}
+                  </div>
+                </div>
+              ))}
+              {/* Indicator for multiple images */}
+              {region.images.length > 1 && (
+                <div className="absolute top-2 right-2 bg-black/60 backdrop-blur text-white text-[10px] px-2 py-1 rounded-full pointer-events-none border border-white/10">
+                  Slide
+                </div>
+              )}
+            </div>
+
+            <div className="p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">{region.icon}</span>
+                <h2 className={`text-lg font-bold ${region.color}`}>{region.name}</h2>
+              </div>
+              <ul className="text-gray-300 text-[0.95rem] leading-relaxed space-y-2">
+                {region.desc.map((sentence, sIdx) => (
+                  <li key={sIdx} className="flex items-start">
+                    <span className={`mr-2 mt-0.5 opacity-80 ${region.color}`}>-</span>
+                    <span className="flex-1">{sentence}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// Arca Classified Views
+// ==========================================
+
+function ArcaList({ onSelect, highlight }: { onSelect: (id: string) => void, highlight?: string }) {
+  return (
+    <div className="space-y-6 relative h-full flex-grow">
+      <div className="arca-stamp top-4 right-4">Top Secret</div>
+      <ArcaHeader title="DATABASE INDEX" docNumber="IDX-001" />
+      
+      <div className="mt-8">
+        <div className="arca-section-title">인물 열람 권한 확인됨</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {characters.map((char) => (
+            <button
+              key={char.id}
+              onClick={() => onSelect(char.id)}
+              className={`text-left p-4 border bg-white shadow-sm transition-all hover:shadow-md hover:border-arca-navy group ${highlight === 'switch' ? 'animate-pulse ring-2 ring-arca-navy ring-offset-1 ring-offset-[#F5F5F5]' : 'border-gray-300'}`}
+            >
+              <div className="flex gap-4 items-center">
+                <div className="arca-portrait-box w-16 h-16 p-1 shrink-0">
+                  <img src={char.image} alt={char.name} className="w-full h-full object-cover" style={{ filter: 'grayscale(30%) contrast(110%)' }} />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500 font-bold mb-1">FILE #{char.id}</div>
+                  <div className="text-arca-navy font-bold">{char.name.split(' (')[0]}</div>
+                  <div className="text-sm text-gray-600 mt-1 truncate max-w-[200px]">{char.affiliation.split(' / ')[0]}</div>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArcaDetail({ character }: { character: Character }) {
+  return (
+    <div className="relative h-full flex flex-col flex-grow">
+      <div className="arca-stamp top-4 sm:top-10 right-4 sm:right-10">Top Secret</div>
+
+      <ArcaHeader title="ARCA CLASSIFIED DOSSIER" docNumber={character.id} />
+
+      <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[40px] flex-grow">
+        
+        {/* Sidebar */}
+        <div className="flex flex-col gap-[20px]">
+          <div className="arca-portrait-box">
+            <img src={character.image} alt={character.name} className="w-full aspect-[3/4] object-cover grayscale-[20%] contrast-125 block" />
+            <div className="text-[11px] opacity-70 uppercase mt-[10px] font-sans pb-[5px] text-gray-500 font-bold">
+              {character.name.split(' (')[0]}<br />Subject Photo #{character.id}
+            </div>
+          </div>
+          
+          <div className="mt-2 md:mt-[10px]">
+            <div className="arca-section-title">기본 인적 사항</div>
+            <div className="grid grid-cols-[80px_1fr] gap-x-[10px] gap-y-[8px] text-[13px] md:text-[14px]">
+              <div className="font-bold text-[#555]">- 성명:</div>
+              <div className="font-medium text-arca-ink">{character.name.split(' (')[0]}</div>
+              
+              <div className="font-bold text-[#555]">- 코드네임:</div>
+              <div className="font-medium text-arca-ink">{character.name.split(' (')[1]?.replace(')','') || ''}</div>
+              
+              <div className="font-bold text-[#555]">- 연령/성별:</div>
+              <div className="font-medium text-arca-ink">{character.age}세 / {character.gender}</div>
+              
+              <div className="font-bold text-[#555]">- 소속:</div>
+              <div className="font-medium text-arca-ink">{character.affiliation.split(' / ')[0]}</div>
+              
+              <div className="font-bold text-[#555]">- 자산:</div>
+              <div className="font-medium text-arca-ink">{character.wealthAndLocation.split('. ')[0]}</div>
+
+              <div className="font-bold text-[#555]">- 거주지:</div>
+              <div className="font-medium text-arca-ink">{character.wealthAndLocation.split('. ')[1] || character.wealthAndLocation}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex flex-col gap-[20px]">
+          <div>
+            <div className="arca-section-title">🛡️ 이능력(Rescue) 평가</div>
+            <div className="grid grid-cols-[100px_1fr] gap-x-[10px] gap-y-[8px] text-[13px] md:text-[14px]">
+              <div className="font-bold text-[#555]">- 등급:</div>
+              <div className="font-black text-arca-red tracking-[1px]">{character.abilityLevel}</div>
+              
+              <div className="font-bold text-[#555]">- 능력명:</div>
+              <div className="font-medium text-arca-ink">{character.abilityName}</div>
+              
+              <div className="font-bold text-[#555]">- 상세 보고:</div>
+              <div className="font-medium text-arca-ink leading-relaxed max-w-[500px]">
+                {character.abilityDesc.split('. ').map((s, idx) => s.trim() ? <div key={idx} className="mb-[2px]">{s.trim()}{s.endsWith('.') ? '' : '.'}</div> : null)}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <div className="arca-section-title">🧠 심리 및 성격 분석</div>
+            <div className="grid grid-cols-[100px_1fr] gap-x-[10px] gap-y-[8px] text-[13px] md:text-[14px]">
+              <div className="font-bold text-[#555]">- 성향:</div>
+              <div className="font-medium text-arca-ink">MBTI: {character.mbti}</div>
+              
+              <div className="font-bold text-[#555]">- 행동 양식:</div>
+              <div className="font-medium text-arca-ink leading-relaxed max-w-[500px]">
+                {character.psychology.split('. ').map((s, idx) => s.trim() ? <div key={idx} className="mb-[2px]">{s.trim()}{s.endsWith('.') ? '' : '.'}</div> : null)}
+              </div>
+            </div>
+          </div>
+
+          <div className="arca-classified-container">
+            <div className="arca-classified-label">Classified Document</div>
+            <div className="arca-section-title border-none text-arca-red mb-[5px] before:bg-arca-red">🔞 기밀 특이 사항</div>
+            <div className="text-[13px] leading-[1.6]">
+              {character.classifiedParams.map((param, idx) => (
+                <div key={idx} className="font-medium text-arca-ink mb-1">- {param}</div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ArcaHeader({ title, docNumber }: { title: string, docNumber: string }) {
+  return (
+    <div className="border-b-[3px] border-arca-navy pb-[10px] mb-[25px] flex justify-between items-end shrink-0">
+      <div className="font-serif text-[24px] sm:text-[28px] font-black text-arca-navy tracking-[2px]">
+        {title}
+      </div>
+      <div className="text-[12px] font-bold opacity-60 font-sans tracking-wide">
+        DOC #{docNumber} | SECURITY CLEARANCE L5
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// Shared Components
+// ==========================================
+
+interface NavButtonProps {
+  active: boolean;
+  onClick: () => void;
+  color: 'neon' | 'arca';
+  isArca?: boolean;
+  children: React.ReactNode;
+}
+
+function NavButton({ active, onClick, color, isArca, children }: NavButtonProps) {
+  if (isArca) {
+    return (
+      <button onClick={onClick} className={`arca-nav-item flex items-center hover:opacity-70 transition-opacity ${active ? 'opacity-100 font-bold' : 'opacity-80'}`}>
+        <span>{children}</span>
+      </button>
+    );
+  }
+
+  let btnClass = "flex-1 flex justify-center items-center py-3 text-xs sm:text-sm transition-all text-center px-1 font-medium font-sans text-gray-400 hover:text-neon-blue ";
+  if (active) btnClass += "text-neon-blue font-bold text-glow transform scale-105";
+
+  return (
+    <button onClick={onClick} className={btnClass}>
+      <span className="truncate w-full">{children}</span>
+    </button>
+  );
+}
+
