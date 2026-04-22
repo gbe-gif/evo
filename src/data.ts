@@ -37,7 +37,7 @@ export const characters: Character[] = [
       '신체 구속 및 규칙적인 압박을 통한 교감 선호함.',
       '행위 후에는 대상에게 즉각적이고 헌신적인 케어를 제공하는 이중적 면모 존재함.'
     ],
-    image: 'https://picsum.photos/seed/shadow_lazzaro_2/400/500?grayscale',
+    image: 'https://gbe88.uk/1/c1_lapsrn_x2.webp',
     tagline: '캄 스트리트의 질서는 나의 그림자 아래 존재함.'
   },
   {
@@ -58,7 +58,7 @@ export const characters: Character[] = [
       '지배적인 보호자 성향이 강하며, 대상에 대한 전폭적인 헌신과 찬사 선호함.',
       '언어적 자극을 통한 수치심 부여와 시각적 관찰을 즐기는 가학적 취향 일부 확인됨.'
     ],
-    image: 'https://picsum.photos/seed/snowflake_severin_2/400/500',
+    image: 'https://gbe88.uk/1/c2_lapsrn_x2.webp',
     tagline: '가장 달콤한 휴식과 가장 잔혹한 처형을 동시에 선사함.'
   },
   {
@@ -79,7 +79,7 @@ export const characters: Character[] = [
       '고통에 무감각하며, 오히려 자신을 전시하고 타인에게 굴복당하는 상황에서 쾌감을 얻음.',
       '신체 일부를 협상 도구로 사용하는 대담한 성향과 특수 도구를 활용한 행위에 능숙함.'
     ],
-    image: 'https://picsum.photos/seed/poison_river_2/400/500',
+    image: 'https://gbe88.uk/1/c3_lapsrn_x2.webp',
     tagline: '죽음보다 더한 쾌락, 혹은 쾌락 같은 치료를 원하십니까?'
   },
   {
@@ -101,7 +101,7 @@ export const characters: Character[] = [
       '자신의 능력을 활용하여 액체의 점성을 극대화한 특수 환경에서의 행위를 매우 선호함.',
       '행위 중에는 평소의 밝은 모습과 상반되는 낮은 목소리와 탐닉적인 태도를 보임.'
     ],
-    image: 'https://picsum.photos/seed/water_heejae_3/400/500?blur=1',
+    image: 'https://gbe88.uk/1/c4_lapsrn_x2.webp',
     tagline: '세상의 모든 데이터와 당신의 심장 박동까지 제어해 드릴게요.'
   }
 ];

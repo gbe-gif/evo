@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { GoogleGenAI } from '@google/genai';
 import { characters, Character } from './data';
 
 type AppMode = 'evoracum' | 'arca';
@@ -49,7 +50,7 @@ export default function App() {
               {evoTab === 'map' && <EvoracumMap />}
               {evoTab === 'profile' && (
                 <div className="text-center mt-20">
-                  <h2 className="text-2xl font-bold mb-4 text-glow">👤 내 정보</h2>
+                  <h2 className="text-2xl font-bold mb-4 text-glow">👤 인물 정보</h2>
                   <p className="text-gray-400 mb-8">시민증을 로드 중입니다...</p>
                   <button 
                     onClick={() => switchToArca()}
@@ -95,7 +96,7 @@ export default function App() {
             <>
               <NavButton active={evoTab === 'home'} onClick={() => setEvoTab('home')} color="neon">🏠 홈</NavButton>
               <NavButton active={evoTab === 'map'} onClick={() => setEvoTab('map')} color="neon">📜 에보라쿰 지도</NavButton>
-              <NavButton active={evoTab === 'profile'} onClick={() => setEvoTab('profile')} color="neon">👤 내 정보</NavButton>
+              <NavButton active={evoTab === 'profile'} onClick={() => setEvoTab('profile')} color="neon">👤 인물 정보</NavButton>
               <NavButton active={evoTab === 'system'} onClick={() => setEvoTab('system')} color="neon">⚙️ 시스템</NavButton>
             </>
           ) : (
@@ -117,12 +118,38 @@ export default function App() {
 // ==========================================
 
 function EvoracumHome() {
+  const [showTerminal, setShowTerminal] = useState(false);
+
   return (
     <div className="space-y-10">
-      <header className="mb-8 border-b border-gray-800 pb-6 text-center">
+      <header className="mb-4 border-b border-gray-800 pb-6 text-center">
         <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-concord-gold mb-2 text-glow">EVORACUM</h1>
         <p className="text-sm text-gray-400 tracking-widest uppercase">신입 시민을 위한 정착 가이드</p>
       </header>
+
+      <div className="text-center">
+        {!showTerminal && (
+          <button 
+            onClick={() => setShowTerminal(true)}
+            className="w-full sm:w-auto px-6 py-4 bg-gray-900 border border-neon-blue text-neon-blue font-bold rounded shadow-[0_0_15px_rgba(0,240,255,0.15)] hover:bg-neon-blue hover:text-gray-900 transition-all duration-300"
+          >
+            🖥️ 에보라쿰 정착 페르소나 추천 (접속)
+          </button>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {showTerminal && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <PersonaTerminal onClose={() => setShowTerminal(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <section>
         <h2 className="text-xl font-bold text-neon-blue mb-4 border-l-4 border-neon-blue pl-3">
@@ -181,11 +208,163 @@ function EvoracumHome() {
   );
 }
 
+import { MODE_1_PERSONAS } from "./data/mode1";
+import { MODE_2_PERSONAS } from "./data/mode2";
+import { MODE_3_PERSONAS } from "./data/mode3";
+import { MODE_4_PERSONAS } from "./data/mode4";
+
+function PersonaTerminal({ onClose }: { onClose: () => void }) {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+
+  const generatePersona = async (mode: number) => {
+    setLoading(true);
+    setResult(null);
+
+    // 모드 1, 2, 3, 4 하드코딩 랜덤 추출 (빠른 로딩 효과 후 출력)
+    if (mode >= 1 && mode <= 4) {
+      setTimeout(() => {
+        let selectedPersona = "";
+        if (mode === 1) {
+          selectedPersona = MODE_1_PERSONAS[Math.floor(Math.random() * MODE_1_PERSONAS.length)];
+        } else if (mode === 2) {
+          selectedPersona = MODE_2_PERSONAS[Math.floor(Math.random() * MODE_2_PERSONAS.length)];
+        } else if (mode === 3) {
+          selectedPersona = MODE_3_PERSONAS[Math.floor(Math.random() * MODE_3_PERSONAS.length)];
+        } else if (mode === 4) {
+          selectedPersona = MODE_4_PERSONAS[Math.floor(Math.random() * MODE_4_PERSONAS.length)];
+        }
+        setResult(selectedPersona);
+        setLoading(false);
+      }, 700);
+      return;
+    }
+
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      
+      let modeDesc = "";
+      if (mode === 1) modeDesc = "30% 확률로 무이능(Lv.0). 이능일 경우 기괴하고 쓸데없는 능력. 직업은 이능과 전혀 무관하게 매칭.";
+      else if (mode === 2) modeDesc = "루스트라, 아르카, 캄 스트리트 등 세계관 핵심 세력과 깊이 연관된 유용한 능력(Lv.3~5)과 그럴듯한 직업.";
+      else if (mode === 3) modeDesc = "라자로, 세베린, 리버, 차희재 중 최소 한 명 이상과 서사적으로 깊게 엮인 상태. (예: 타겟의 치명적 약점을 알거나, 특이 체질로 인해 타겟의 집착을 받는 등 로맨스/스릴러 특화)";
+      else if (mode === 4) modeDesc = "메인 캐릭터들을 어이없게 만들거나 골머리 앓게 하는 황당한 능력과 상황. 유쾌하고 골때리는 혐관/채무 관계.";
+
+      const prompt = `당신은 에보라쿰 시민망의 정착 지원 시스템입니다.
+제시된 모드의 제약사항에 맞춰, 에보라쿰 세계관에 완벽히 어울리는 캐릭터 페르소나 설정 1개를 즉석에서 창작하세요.
+
+[모드 제약사항]
+${modeDesc}
+
+[출력 양식]
+다른 부가적인 말은 절대 하지 말고, 아래의 양식에 맞추어 딱 내용만 출력하세요. 어미는 항상 명사형(~함, ~임)으로 간결히 작성.
+
+**[생성된 이능]｜[생성된 Lv]｜[생성된 직업]｜[생성된 평판]**
+
+* **설정 및 배경:** (생성된 캐릭터의 배경과 현재 상황을 명사형 어미로 2~3줄 요약)
+* **주요 인물과의 관계:** (모바일 환경에 맞게 간결히, 모드 3,4의 경우 주요 4인방과의 특별한 관계 포함)`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: prompt
+      });
+      
+      setResult(response.text || "데이터 수신 오류. 다시 시도하십시오.");
+    } catch (error) {
+      console.error(error);
+      setResult("시스템 과부하: 아르카 네트워크에 연결할 수 없습니다.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="bg-[#0f0f11] border border-gray-700 p-5 rounded-lg shadow-2xl relative font-sans">
+      <button onClick={onClose} className="absolute text-2xl top-4 right-4 text-gray-500 hover:text-white transition-colors">
+        ✕
+      </button>
+
+      {/* 헤더 섹션 */}
+      <div className="mb-6 space-y-3 border-b border-gray-800 pb-5 text-center">
+        <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
+          이능력 사회의<br/>아마도 평범한 시민인데요
+        </h3>
+        <p className="text-[#00F0FF] opacity-90 font-medium text-sm sm:text-base">
+          * 22세기 메가 시티, 에보라쿰(Evoracum)에 오신 것을 환영합니다.
+        </p>
+      </div>
+
+      {/* 안내 섹션 */}
+      <div className="mb-6 bg-[#1a1a1e] border border-gray-700/50 p-4 rounded text-[0.95em] text-gray-300">
+        <h4 className="font-bold text-concord-gold mb-2 flex items-center gap-2">
+          <span>🎰</span> 에보라쿰 정착 지원처: 페르소나 추천 시스템
+        </h4>
+        <p className="leading-relaxed">
+          "어떤 신분으로 에보라쿰에 입국할지 고민되시나요? 아르카 데이터베이스에 블라인드 처리되어 저장된 각 카테고리별 50개의 기밀 페르소나 중 하나를 무작위로 추출하여 열람해 드립니다."
+        </p>
+        <p className="text-gray-400 text-sm mt-2 font-medium">
+          ※ 목록에 없는 유니크한 성향이나 직업을 원하실 경우, 프롤로그 진입 후 채팅창에 <span className="text-concord-gold">!도움</span> 을 입력해 주세요.
+        </p>
+      </div>
+
+      {/* 버튼(메뉴) 섹션 */}
+      <div className="space-y-4">
+        <p className="font-bold text-[#b4b4b4]">
+          [ 시스템 메뉴: 원하시는 정착 모드를 선택(클릭)하세요. ]
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button onClick={() => generatePersona(1)} className="group p-3 border border-gray-700 text-left rounded hover:border-[#00F0FF] hover:bg-[#00F0FF]/10 transition-colors">
+            <div className="font-bold text-white group-hover:text-[#00F0FF]">🎲 1. 완전 랜덤!</div>
+            <div className="text-xs text-gray-500 mt-1">혼돈의 에보라쿰식 생존</div>
+          </button>
+          <button onClick={() => generatePersona(2)} className="group p-3 border border-gray-700 text-left rounded hover:border-[#FFD700] hover:bg-[#FFD700]/10 transition-colors">
+            <div className="font-bold text-white group-hover:text-[#FFD700]">🗺️ 2. 세계관 딥다이브</div>
+            <div className="text-xs text-gray-500 mt-1">아르카와 루스트라의 톱니바퀴</div>
+          </button>
+          <button onClick={() => generatePersona(3)} className="group p-3 border border-gray-700 text-left rounded hover:border-[#D32F2F] hover:bg-[#D32F2F]/10 transition-colors">
+            <div className="font-bold text-white group-hover:text-[#D32F2F]">❤️ 3. 치명적 얽힘</div>
+            <div className="text-xs text-gray-500 mt-1">네 남자와의 질척하고 위험한 관계</div>
+          </button>
+          <button onClick={() => generatePersona(4)} className="group p-3 border border-gray-700 text-left rounded hover:border-purple-400 hover:bg-purple-400/10 transition-colors">
+            <div className="font-bold text-white group-hover:text-purple-400">🤡 4. 대환장 개그물</div>
+            <div className="text-xs text-gray-500 mt-1">맑은 눈의 광인, 에보라쿰을 찢다</div>
+          </button>
+        </div>
+      </div>
+
+      {loading && (
+        <div className="mt-6 flex justify-center items-center py-8 border border-gray-800 bg-[#0a0a0c] rounded">
+          <div className="text-[#00F0FF] animate-pulse font-mono flex flex-col items-center gap-3">
+            <div className="w-6 h-6 border-2 border-[#00F0FF] border-t-transparent rounded-full animate-spin"></div>
+            아르카 데이터베이스에서 기밀 페르소나를 추출 중입니다...
+          </div>
+        </div>
+      )}
+
+      {result && !loading && (
+        <div className="mt-6 border border-[#a29b83] bg-[#0c0c09] p-5 rounded relative">
+          <div className="font-bold text-[#FFD700] mb-3 pb-2 border-b border-[#FFD700]/20">
+            [ 📝 열람된 페르소나 기밀 데이터 ]
+            <div className="text-xs text-gray-500 font-normal mt-1">*(복사하여 즉시 RP 세팅에 활용하세요.)*</div>
+          </div>
+          <div className="text-gray-200 text-[0.95rem] whitespace-pre-wrap leading-relaxed">
+            {result}
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
 function EvoracumMap() {
   const regions = [
     { 
       icon: '💧', name: '리비움 (중심부)', title: '캄 스트리트', subtitle: '절대 성역', 
-      desc: ['대광장과 맑은 운하가 흐르는 최첨단 베네치아 풍경.', 'PVP 및 파문자 처형이 전면 금지된 라자로 소유의 절대 성역.', '단, 경범죄만 저질러도 즉각 파문당하는 통제된 꿈의 주거지임.'], 
+      desc: [
+        '대광장과 맑은 운하가 흐르는 최첨단 베네치아 풍경.', 
+        '내부의 [캄 스트리트]는 대광장 동쪽으로 3블럭 규모의 10차선 도로와 상가가 위치한 구역.',
+        '이곳은 PVP 및 파문자 처형이 전면 금지된 라자로 소유의 절대 성역이다.', 
+        '단, 경범죄만 저질러도 즉각 파문당하는 통제된 꿈의 주거지임.'
+      ], 
       color: 'text-blue-400',
       images: [{ url: 'https://gbe88.uk/K/BG_19.webp', label: '리비움 전경' }]
     },
@@ -240,9 +419,6 @@ function EvoracumMap() {
               {region.images.map((img, i) => (
                 <div key={i} className="relative w-full shrink-0 snap-center aspect-[21/9] bg-black">
                   <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 md:p-3 text-xs md:text-sm font-medium text-gray-200 flex items-end">
-                    {img.label}
-                  </div>
                 </div>
               ))}
               {/* Indicator for multiple images */}
@@ -295,7 +471,7 @@ function ArcaList({ onSelect, highlight }: { onSelect: (id: string) => void, hig
             >
               <div className="flex gap-4 items-center">
                 <div className="arca-portrait-box w-16 h-16 p-1 shrink-0">
-                  <img src={char.image} alt={char.name} className="w-full h-full object-cover" style={{ filter: 'grayscale(30%) contrast(110%)' }} />
+                  <img src={char.image} alt={char.name} className="w-full h-full object-cover" style={{ filter: 'grayscale(30%) contrast(110%)', objectPosition: 'center 15%' }} />
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 font-bold mb-1">FILE #{char.id}</div>
@@ -323,7 +499,7 @@ function ArcaDetail({ character }: { character: Character }) {
         {/* Sidebar */}
         <div className="flex flex-col gap-[20px]">
           <div className="arca-portrait-box">
-            <img src={character.image} alt={character.name} className="w-full aspect-[3/4] object-cover grayscale-[20%] contrast-125 block" />
+            <img src={character.image} alt={character.name} className="w-full aspect-[3/4] object-cover grayscale-[20%] contrast-125 block object-[center_15%]" />
             <div className="text-[11px] opacity-70 uppercase mt-[10px] font-sans pb-[5px] text-gray-500 font-bold">
               {character.name.split(' (')[0]}<br />Subject Photo #{character.id}
             </div>
