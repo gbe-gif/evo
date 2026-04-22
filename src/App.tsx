@@ -13,6 +13,7 @@ type EvoracumTab = 'home' | 'map' | 'profile' | 'system';
 type ArcaTab = 'list' | 'switch' | 'detail';
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [appMode, setAppMode] = useState<AppMode>('evoracum');
   const [evoTab, setEvoTab] = useState<EvoracumTab>('home');
   const [arcaTab, setArcaTab] = useState<ArcaTab>('list');
@@ -35,6 +36,9 @@ export default function App() {
 
   return (
     <div className={`min-h-screen w-full transition-colors duration-500 flex flex-col ${appMode === 'evoracum' ? 'bg-cyber-bg text-gray-100 font-sans' : 'arca-container font-sans'}`}>
+      <AnimatePresence>
+        {showIntro && <IntroOverlay onComplete={() => setShowIntro(false)} />}
+      </AnimatePresence>
       <main className={`flex-1 w-full ${appMode === 'evoracum' ? 'max-w-3xl' : 'max-w-5xl'} mx-auto pb-24 relative overflow-x-hidden flex flex-col justify-center`}>
         <AnimatePresence mode="wait">
           {appMode === 'evoracum' ? (
@@ -180,9 +184,12 @@ function EvoracumHome() {
           <li className="flex items-start"><span className="text-concord-gold mr-2">▪</span> 신고 시 사고 수습반 지원 등 '특별 보험' 혜택을 제공받음</li>
           <li className="flex items-start"><span className="text-concord-gold mr-2">▪</span> 시민들은 레스큐 사용 규정인 '아르카 법'을 무조건 준수해야 함</li>
           <li className="flex items-start text-gray-200 bg-gray-900/50 p-3 rounded border border-gray-800 border-l-concord-gold border-l-2">
-            <div>
+            <div className="space-y-1">
               <span className="font-bold text-concord-gold flex items-center gap-1 mb-1"><span>💰</span> 화폐 (콘코드, Concord)</span>
-              옥수수알 빛깔의 노란 금화(속칭 콘). 아르카가 발행하며 위조 방지 레스큐가 얽힌 역작. 1콘 당 옛 화폐 기준 약 1000$의 가치를 지님. 물가 기준 생수 한 병은 0.001콘임.
+              <p>옥수수알 빛깔의 노란 금화(속칭 콘).</p>
+              <p>아르카가 발행하며 위조 방지 레스큐가 얽힌 역작.</p>
+              <p>1콘 당 옛 화폐 기준 약 1000$의 가치를 지님.</p>
+              <p>물가 기준 생수 한 병은 0.001콘임.</p>
             </div>
           </li>
         </ul>
@@ -445,6 +452,30 @@ function EvoracumMap() {
             </div>
           </motion.div>
         ))}
+
+        {/* 미수록 이미지 섹션 */}
+        <div className="pt-10 border-t border-gray-800">
+          <h2 className="text-xl font-bold text-gray-300 mb-6 flex items-center gap-2">
+            🖼️ 미수록 이미지
+          </h2>
+          <div className="grid grid-cols-1 gap-6">
+            {[
+              { url: 'https://gbe88.uk/1/river_lapsrn_x2.webp', label: '리비움 운하' },
+              { url: 'https://gbe88.uk/1/street_lapsrn_x2.webp', label: '캄 스트리트' },
+              { url: 'https://gbe88.uk/1/lazaro_lapsrn_x2.webp', label: '라자로의 집무실' },
+              { url: 'https://gbe88.uk/1/office_lapsrn_x2.webp', label: '희재의 오피스' }
+            ].map((img, idx) => (
+              <div key={idx} className="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden shadow-lg">
+                <div className="aspect-[21/9] bg-black">
+                  <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
+                </div>
+                <div className="p-3 text-sm text-gray-400 text-center font-medium">
+                  - {img.label} -
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -591,6 +622,88 @@ function ArcaHeader({ title, docNumber }: { title: string, docNumber: string }) 
 // ==========================================
 // Shared Components
 // ==========================================
+
+function IntroOverlay({ onComplete }: { onComplete: () => void }) {
+  const [progress, setProgress] = React.useState(0);
+  const [status, setStatus] = React.useState('INITIALIZING SYSTEM...');
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          setTimeout(onComplete, 800);
+          return 100;
+        }
+        const next = prev + Math.random() * 15;
+        
+        if (next > 20) setStatus('CONNECTING TO ARCA GLOBAL NETWORK...');
+        if (next > 50) setStatus('AUTHENTICATING CITIZEN DATA...');
+        if (next > 80) setStatus('SYNCING EVORACUM MESH-LINK...');
+        if (next >= 100) setStatus('ACCESS GRANTED. WELCOME.');
+        
+        return next > 100 ? 100 : next;
+      });
+    }, 150);
+    return () => clearInterval(timer);
+  }, [onComplete]);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] bg-cyber-bg flex flex-col items-center justify-center p-6 text-center"
+    >
+      <div className="max-w-md w-full space-y-8">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="space-y-2"
+        >
+          <h1 className="text-4xl font-black text-white tracking-[0.2em] italic">EVORACUM</h1>
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-neon-blue to-transparent" />
+        </motion.div>
+
+        <div className="space-y-4">
+          <div className="flex justify-between text-[10px] uppercase tracking-widest text-[#00F0FF] font-mono">
+            <span>{status}</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          
+          <div className="h-1 w-full bg-gray-900 rounded-full overflow-hidden border border-gray-800 p-[1px]">
+            <motion.div 
+              className="h-full bg-neon-blue shadow-[0_0_10px_rgba(0,240,255,0.8)]"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ ease: "easeOut" }}
+            />
+          </div>
+
+          <div className="grid grid-cols-4 gap-1 h-3 mt-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <motion.div
+                key={i}
+                animate={{ 
+                  opacity: progress > (i + 1) * 25 ? 1 : 0.2,
+                  backgroundColor: progress > (i + 1) * 25 ? '#00F0FF' : '#1f2937'
+                }}
+                className="h-full rounded-sm"
+              />
+            ))}
+          </div>
+        </div>
+
+        <motion.p 
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="text-[9px] text-gray-500 font-mono tracking-tighter"
+        >
+          SECURITY LEVEL: L5-ACCESS | ENCRYPTION: ARC-256 | TIMESTAMP: {new Date().toISOString()}
+        </motion.p>
+      </div>
+    </motion.div>
+  );
+}
 
 interface NavButtonProps {
   active: boolean;
