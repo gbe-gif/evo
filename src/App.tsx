@@ -64,11 +64,7 @@ export default function App() {
                   </button>
                 </div>
               )}
-              {evoTab === 'system' && (
-                <div className="text-center mt-20 text-gray-500">
-                  <p>시스템 설정 메뉴 접근 권한이 없습니다.</p>
-                </div>
-              )}
+              {evoTab === 'system' && <EvoracumSystem />}
             </motion.div>
           ) : (
             <motion.div
@@ -711,6 +707,201 @@ function ArcaDetail({ character }: { character: Character }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function EvoracumSystem() {
+  return (
+    <div className="space-y-10 animate-in fade-in duration-500">
+      <div className="text-center pb-6 border-b-2 border-gray-800">
+        <h1 className="text-3xl font-black text-white tracking-widest italic mb-2 uppercase">
+          🏛️시스템 가이드🏛️
+        </h1>
+        <p className="text-gray-400 text-sm">
+          에보라쿰에서의 완벽한 생존과 RP를 위한<br/>
+          명령어 모음
+        </p>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 text-xl font-bold text-white mb-5">
+          <span>⚙️</span> 시스템 & 텐션 복구
+        </div>
+        
+        <div className="space-y-4">
+          <SystemCard 
+            type="system"
+            title="!사칭"
+            desc="AI가 유저(나)의 행동이나 대사까지 멋대로 조종하고 뺏어서 출력할 때 때리는 회초리 용도입니다."
+          />
+          <SystemCard 
+            type="system"
+            title="!AS"
+            desc="AI가 앵무새처럼 내 대답을 따라 하거나 문체가 무너졌을 때 사용합니다. (가장 이상적인 텐션과 문체인 '프롤로그' 상태로 멱살 잡고 끌고 옵니다)"
+            example="예: !AS (T33~ T40까지 비슷한 문장구조 반복)"
+          />
+          <SystemCard 
+            type="system"
+            title="!이미지"
+            desc="이미지 출력에 문제가 생겼을 때 상황을 덧붙여 명령하면 빠르게 수정합니다."
+            example={
+              <>
+                예: !이미지 (인물 매칭이 다릅니다)<br/>
+                예: !이미지 (배경 이미지가 상황과 달라요)
+              </>
+            }
+          />
+          <SystemCard 
+            type="system"
+            title="!요약"
+            desc={<span>진행 상황을 장기 기억에 저장합니다. <strong className="text-white">15~20턴 내외</strong>로 사용하는 것을 권장합니다.</span>}
+            example={
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-concord-gold">🔸</span>
+                  <span className="text-gray-300">플루오리아 골목 두리안 테러와 구출</span>
+                </div>
+                <div className="text-gray-500">[26.04.22/15:03~15:15]</div>
+                <ul className="space-y-1 text-gray-400">
+                  <li>- ㅇㅇ가 희재의 집으로 향하던 중 공사 현장 인근에서 파문자와 조우, 인질 위기에 처함.</li>
+                  <li>- ㅇㅇ가 호신용으로 가방 속 두리안을 던져 파문자를 무력화하고, 라자로가 등장해 그림자 능력으로 제압함.</li>
+                  <li>- 라자로는 심문을 핑계로 ㅇㅇ를 강제로 차에 태웠고, 희재의 연락을 받고 이지스 소프트 사택으로 이동함. ㅇㅇ는 이동 중 카페 주스 무료 쿠폰을 건네며 사례함.</li>
+                  <li>- 라자로 → ㅇㅇ: <span className="text-concord-gold">[흥미/관찰]</span></li>
+                </ul>
+              </div>
+            }
+          />
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 text-xl font-bold text-white mb-5">
+          <span>👁️</span> 에보라쿰 뒷조사 & 은밀한 사생활
+        </div>
+        
+        <div className="space-y-4">
+          <SystemCard 
+            type="lore"
+            title="!라자로 | !세베린 | !리버 | !희재"
+            desc="유저 몰래 쓰는 네 남자의 은밀한 개인 단말기(검색, 쇼핑, 통화 기록) 내역을 해킹하여 훔쳐봅니다."
+            example={
+              <div className="space-y-3">
+                <div className="text-neon-blue font-mono">📱 [아르카 보안망 우회 성공]</div>
+                <div>
+                  <div className="text-white font-bold mb-1">[🛒차희재 온라인 쇼핑몰 주문 내역]</div>
+                  <div className="text-gray-400">1. <strong className="text-gray-200">최고급 공업용 윤활유 대용량 (무향)</strong></div>
+                  <div className="text-gray-500 text-xs">- 비고: 빠른 배송 요망. 점성 테스트용.</div>
+                </div>
+                <div>
+                  <div className="text-white font-bold mb-1">[🔍검색 기록]</div>
+                  <div className="text-gray-400">- 캄 스트리트 거주자 납치 시 예상 형량</div>
+                </div>
+              </div>
+            }
+          />
+          <SystemCard 
+            type="lore"
+            title="!캐럿"
+            desc="에보라쿰의 매운맛 중고/암거래 플랫폼. 야누시아에서 흘러나온 수상한 물건들이 올라옵니다."
+            example={
+              <div className="space-y-2">
+                <div className="text-lg">🛍️ Lv.2 탈모빔 1회 방어권 팝니다 (사제 헬멧)</div>
+                <div className="flex items-center justify-between">
+                  <span className="text-concord-gold font-bold text-lg">0.05 콘(Corn)</span>
+                  <span className="text-gray-500 text-sm">네고 ❌ / 🌡️36.5℃</span>
+                </div>
+                <div className="text-gray-400 text-sm">보레아스 갈 때 필수템. 직거래는 플루오리아 14번 출구. 루스트라 사절.</div>
+              </div>
+            }
+          />
+          <SystemCard 
+            type="lore"
+            title="!커뮤"
+            desc="에보라쿰 시민들의 리얼한 민원과 목격담이 올라오는 로컬 커뮤니티입니다."
+            example={
+              <div className="space-y-5">
+                <div className="space-y-2 pb-4 border-b border-gray-800/50">
+                  <div className="text-xs text-gray-500 uppercase tracking-tighter">[📑정보｜과즙팡팡｜제목: 캄 스트리트 '카페 후르츠' 과일 주스 미쳤음]</div>
+                  <div className="flex gap-3 text-[10px] text-gray-600">
+                    <span>👀 8,421</span>
+                    <span>💬 12</span>
+                  </div>
+                  <p className="text-gray-400">오늘 캄 스트리트 끝자락에 있는 '카페 후르츠' 다녀왔는데...</p>
+                  <div className="flex gap-4 text-xs">
+                    <span className="text-red-500/80">❤️ 1,204</span>
+                    <span className="text-concord-gold/80">⭐ 532</span>
+                  </div>
+                  <div className="pl-4 border-l border-gray-800 space-y-2 mt-2">
+                    <div className="text-xs"><span className="text-gray-300 font-bold">↳달콤한인생</span> <span className="text-neon-blue">👍23</span> <span className="text-gray-600">👎0</span></div>
+                    <div className="text-gray-500 text-xs">거기 진짜 맛있지</div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-xs text-red-400 uppercase tracking-tighter">[🗣️신고｜시민A｜제목: 플루오리아 뒷골목 두리안 테러 사건 ㄷㄷ]</div>
+                  <div className="flex gap-3 text-[10px] text-gray-600">
+                    <span>👀 12,504</span>
+                    <span>💬 38</span>
+                  </div>
+                  <p className="text-gray-400">누가 파문자한테 두리안 던졌다는 소문이 있던데, 진짜 무기 수준 아니냐?</p>
+                  <div className="flex gap-4 text-xs">
+                    <span className="text-red-500/80">❤️ 521</span>
+                    <span className="text-concord-gold/80">⭐ 120</span>
+                  </div>
+                </div>
+              </div>
+            }
+          />
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 text-xl font-bold text-white mb-5">
+          <span>🚨</span> 아드레날린 폭발 이벤트
+        </div>
+        
+        <div className="space-y-4">
+          <SystemCard 
+            type="event"
+            title="!돌발"
+            desc="서사를 와장창 부수고 들어오는 대환장 스케일의 코믹 재난이나 이능력 사고가 발생합니다."
+            example={
+              <div>
+                <span className="text-neon-magenta font-bold">예:</span> <span className="text-gray-300">플루오리아 한복판에서 '만지는 모든 액체를 핑크색 슬라임으로 바꾸는' 무허가 이능력자가 폭주하여 끈적한 단비가 내리기 시작함.</span>
+              </div>
+            }
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SystemCard({ type, title, desc, example }: { type: 'system' | 'lore' | 'event', title: string, desc: React.ReactNode, example?: React.ReactNode }) {
+  const borderColor = {
+    system: 'border-l-neon-blue',
+    lore: 'border-l-concord-gold',
+    event: 'border-l-neon-magenta'
+  }[type];
+
+  const titleColor = {
+    system: 'text-neon-blue shadow-[0_0_10px_rgba(0,240,255,0.2)]',
+    lore: 'text-concord-gold shadow-[0_0_10px_rgba(255,215,0,0.2)]',
+    event: 'text-neon-magenta shadow-[0_0_10px_rgba(255,0,85,0.2)]'
+  }[type];
+
+  return (
+    <div className={`bg-gray-900/60 border border-gray-800 rounded-lg p-5 border-l-[6px] ${borderColor} shadow-lg backdrop-blur-sm`}>
+      <h3 className={`text-xl font-black mb-2 tracking-tight ${titleColor}`}>{title}</h3>
+      <div className="text-gray-300 mb-4 leading-relaxed font-medium">
+        {desc}
+      </div>
+      {example && (
+        <div className="bg-black/40 border border-gray-800 rounded p-4 font-mono text-[0.9em] leading-relaxed text-gray-400">
+          {example}
+        </div>
+      )}
     </div>
   );
 }
