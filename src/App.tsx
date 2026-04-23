@@ -579,7 +579,7 @@ function ArcaDetail({ character }: { character: Character }) {
                 <img 
                   src={character.gallery[selectedIdx]} 
                   alt="Full size" 
-                  className={`max-w-full max-h-[85vh] object-contain shadow-2xl ${selectedIdx === 0 ? 'aspect-[21/9]' : 'aspect-[2/3]'}`}
+                  className={`max-w-full max-h-[85vh] object-contain shadow-2xl ${selectedIdx === 0 ? 'aspect-[21/9]' : 'aspect-[3/2]'}`}
                   onClick={(e) => e.stopPropagation()}
                 />
               </motion.div>
@@ -686,7 +686,7 @@ function ArcaDetail({ character }: { character: Character }) {
                   onClick={() => openLightbox(idx)}
                   className={`arca-portrait-box p-2 bg-white border border-gray-300 cursor-pointer hover:shadow-md transition-shadow group ${idx === 0 ? 'sm:col-span-2' : ''}`}
                 >
-                  <div className={`bg-gray-100 overflow-hidden relative ${idx === 0 ? 'aspect-[21/9]' : 'aspect-[2/3]'}`}>
+                  <div className={`bg-gray-100 overflow-hidden relative ${idx === 0 ? 'aspect-[21/9]' : 'aspect-[3/2]'}`}>
                     <img 
                       src={imgUrl} 
                       alt={`Gallery ${idx + 1}`} 
