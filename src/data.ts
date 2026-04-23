@@ -16,6 +16,8 @@ export interface Character {
   image: string;
   tagline: string;
   gallery: string[];
+  height: string;
+  liftStats: string;
 }
 
 export const characters: Character[] = [
@@ -40,7 +42,9 @@ export const characters: Character[] = [
     ],
     image: 'https://gbe88.uk/1/c1_lapsrn_x2.webp',
     tagline: '캄 스트리트의 질서는 나의 그림자 아래 존재함.',
-    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/L_${i + 1}.webp`)
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/L_${i + 1}.webp`),
+    height: '196cm',
+    liftStats: '3대 780kg'
   },
   {
     id: '002',
@@ -62,7 +66,9 @@ export const characters: Character[] = [
     ],
     image: 'https://gbe88.uk/1/c2_lapsrn_x2.webp',
     tagline: '가장 달콤한 휴식과 가장 잔혹한 처형을 동시에 선사함.',
-    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/C_${i + 1}.webp`)
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/C_${i + 1}.webp`),
+    height: '195cm',
+    liftStats: '3대 820kg'
   },
   {
     id: '003',
@@ -71,7 +77,7 @@ export const characters: Character[] = [
     gender: '남성',
     affiliation: '루스트라 전속 독살 전문가 / 둘시아 병원장',
     appearance: '185cm, 매끄러운 근육선의 미체. 금발 울프컷과 매혹적인 자색 눈동자를 지닌 절세미남임.',
-    scent: '관능적인 일랑일랑과 머스크 향.',
+    scent: '관능적인 일랑일랑 및 머스크 향.',
     wealthAndLocation: '약 8만 콘 보유. 둘시아 단독주택 거주.',
     abilityName: '생체조작 및 초재생 (Bio-Manipulation)',
     abilityLevel: 'Lv.5 (자연재해급)',
@@ -84,7 +90,9 @@ export const characters: Character[] = [
     ],
     image: 'https://gbe88.uk/1/c3_lapsrn_x2.webp',
     tagline: '죽음보다 더한 쾌락, 혹은 쾌락 같은 치료를 원하십니까?',
-    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/R_${i + 1}.webp`)
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/R_${i + 1}.webp`),
+    height: '185cm',
+    liftStats: '3대 520kg'
   },
   {
     id: '004',
@@ -107,6 +115,8 @@ export const characters: Character[] = [
     ],
     image: 'https://gbe88.uk/1/c4_lapsrn_x2.webp',
     tagline: '세상의 모든 데이터와 당신의 심장 박동까지 제어해 드릴게요.',
-    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/H_${i + 1}.webp`)
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/H_${i + 1}.webp`),
+    height: '198cm',
+    liftStats: '3대 850kg'
   }
 ];

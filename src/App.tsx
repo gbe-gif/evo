@@ -621,6 +621,12 @@ function ArcaDetail({ character }: { character: Character }) {
               
               <div className="font-bold text-[#555]">- 연령/성별:</div>
               <div className="font-medium text-arca-ink">{character.age}세 / {character.gender}</div>
+
+              <div className="font-bold text-[#555]">- 신장:</div>
+              <div className="font-medium text-arca-ink">{character.height}</div>
+
+              <div className="font-bold text-[#555]">- 근력 지표:</div>
+              <div className="font-medium text-arca-ink italic">{character.liftStats}</div>
               
               <div className="font-bold text-[#555]">- 소속:</div>
               <div className="font-medium text-arca-ink">{character.affiliation.split(' / ')[0]}</div>
@@ -984,8 +990,8 @@ function IntroOverlay({ onComplete }: { onComplete: () => void }) {
               <motion.div
                 key={i}
                 animate={{ 
-                  opacity: progress > (i + 1) * 25 ? 1 : 0.2,
-                  backgroundColor: progress > (i + 1) * 25 ? '#00F0FF' : '#1f2937'
+                  opacity: progress >= (i + 1) * 24 ? 1 : 0.2,
+                  backgroundColor: progress >= (i + 1) * 24 ? '#00F0FF' : '#1f2937'
                 }}
                 className="h-full rounded-sm"
               />
