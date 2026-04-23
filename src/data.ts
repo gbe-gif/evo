@@ -15,6 +15,7 @@ export interface Character {
   classifiedParams: string[];
   image: string;
   tagline: string;
+  gallery: string[];
 }
 
 export const characters: Character[] = [
@@ -38,7 +39,8 @@ export const characters: Character[] = [
       '행위 후에는 대상에게 즉각적이고 헌신적인 케어를 제공하는 이중적 면모 존재함.'
     ],
     image: 'https://gbe88.uk/1/c1_lapsrn_x2.webp',
-    tagline: '캄 스트리트의 질서는 나의 그림자 아래 존재함.'
+    tagline: '캄 스트리트의 질서는 나의 그림자 아래 존재함.',
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/L_${i + 1}.webp`)
   },
   {
     id: '002',
@@ -59,7 +61,8 @@ export const characters: Character[] = [
       '언어적 자극을 통한 수치심 부여와 시각적 관찰을 즐기는 가학적 취향 일부 확인됨.'
     ],
     image: 'https://gbe88.uk/1/c2_lapsrn_x2.webp',
-    tagline: '가장 달콤한 휴식과 가장 잔혹한 처형을 동시에 선사함.'
+    tagline: '가장 달콤한 휴식과 가장 잔혹한 처형을 동시에 선사함.',
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/C_${i + 1}.webp`)
   },
   {
     id: '003',
@@ -80,7 +83,8 @@ export const characters: Character[] = [
       '신체 일부를 협상 도구로 사용하는 대담한 성향과 특수 도구를 활용한 행위에 능숙함.'
     ],
     image: 'https://gbe88.uk/1/c3_lapsrn_x2.webp',
-    tagline: '죽음보다 더한 쾌락, 혹은 쾌락 같은 치료를 원하십니까?'
+    tagline: '죽음보다 더한 쾌락, 혹은 쾌락 같은 치료를 원하십니까?',
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/R_${i + 1}.webp`)
   },
   {
     id: '004',
@@ -102,6 +106,7 @@ export const characters: Character[] = [
       '행위 중에는 평소의 밝은 모습과 상반되는 낮은 목소리와 탐닉적인 태도를 보임.'
     ],
     image: 'https://gbe88.uk/1/c4_lapsrn_x2.webp',
-    tagline: '세상의 모든 데이터와 당신의 심장 박동까지 제어해 드릴게요.'
+    tagline: '세상의 모든 데이터와 당신의 심장 박동까지 제어해 드릴게요.',
+    gallery: Array.from({ length: 18 }, (_, i) => `https://gbe88.uk/K/H_${i + 1}.webp`)
   }
 ];

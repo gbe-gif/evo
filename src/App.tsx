@@ -519,11 +519,89 @@ function ArcaList({ onSelect, highlight }: { onSelect: (id: string) => void, hig
 }
 
 function ArcaDetail({ character }: { character: Character }) {
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+
+  const openLightbox = (idx: number) => {
+    setSelectedIdx(idx);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeLightbox = () => {
+    setSelectedIdx(null);
+    document.body.style.overflow = 'auto';
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (selectedIdx === null) return;
+    setSelectedIdx((selectedIdx + 1) % character.gallery.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (selectedIdx === null) return;
+    setSelectedIdx((selectedIdx - 1 + character.gallery.length) % character.gallery.length);
+  };
+
   return (
     <div className="relative h-full flex flex-col flex-grow">
       <div className="arca-stamp top-4 sm:top-10 right-4 sm:right-10">Top Secret</div>
 
       <ArcaHeader title="ARCA CLASSIFIED DOSSIER" docNumber={character.id} />
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedIdx !== null && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeLightbox}
+            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-10"
+          >
+            <button 
+              onClick={closeLightbox}
+              className="absolute top-6 right-6 text-white/60 hover:text-white z-10 p-2"
+            >
+              <span className="text-2xl font-bold">✕</span>
+            </button>
+
+            <div className="relative max-w-full max-h-full flex items-center justify-center">
+              <button 
+                onClick={prevImage}
+                className="absolute left-0 sm:-left-16 text-white/40 hover:text-white p-4 z-10"
+              >
+                <span className="text-4xl font-serif">‹</span>
+              </button>
+
+              <motion.div
+                key={selectedIdx}
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="flex items-center justify-center"
+              >
+                <img 
+                  src={character.gallery[selectedIdx]} 
+                  alt="Full size" 
+                  className={`max-w-full max-h-[85vh] object-contain shadow-2xl ${selectedIdx === 0 ? 'aspect-[21/9]' : 'aspect-[2/3]'}`}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </motion.div>
+
+              <button 
+                onClick={nextImage}
+                className="absolute right-0 sm:-right-16 text-white/40 hover:text-white p-4 z-10"
+              >
+                <span className="text-4xl font-serif">›</span>
+              </button>
+
+              <div className="absolute -bottom-8 left-0 right-0 text-center text-white/50 text-xs font-mono">
+                {selectedIdx + 1} / {character.gallery.length} • TAP OUTSIDE TO CLOSE
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-[40px] flex-grow">
         
@@ -597,6 +675,37 @@ function ArcaDetail({ character }: { character: Character }) {
             <div className="text-[13px] leading-[1.6]">
               {character.classifiedParams.map((param, idx) => (
                 <div key={idx} className="font-medium text-arca-ink mb-1">- {param}</div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-gray-200 pt-6">
+            <div className="arca-section-title">📸 수록 이미지 (Gallery)</div>
+            <p className="text-[11px] text-gray-500 mb-4">* 이미지를 클릭하면 크게 볼 수 있습니다.</p>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {character.gallery.map((imgUrl, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => openLightbox(idx)}
+                  className={`arca-portrait-box p-2 bg-white border border-gray-300 cursor-pointer hover:shadow-md transition-shadow group ${idx === 0 ? 'sm:col-span-2' : ''}`}
+                >
+                  <div className={`bg-gray-100 overflow-hidden relative ${idx === 0 ? 'aspect-[21/9]' : 'aspect-[2/3]'}`}>
+                    <img 
+                      src={imgUrl} 
+                      alt={`Gallery ${idx + 1}`} 
+                      className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 transition-all duration-300" 
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-arca-navy/0 group-hover:bg-arca-navy/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <span className="text-arca-navy font-bold text-xs bg-white/90 px-3 py-1 border border-arca-navy">관찰하기</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center mt-2 px-1">
+                    <span className="text-[10px] text-gray-400 font-mono tracking-tighter">DATA_SRC: {character.name.split(' ')[0][0]}_{idx+1}</span>
+                    <span className="text-[9px] text-gray-300 uppercase italic">Confidential</span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
